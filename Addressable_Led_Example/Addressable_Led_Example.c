@@ -6,6 +6,7 @@
  */ 
 
 #define F_CPU 16000000L
+#define LEDS 144
 
 #include <avr/io.h>
 #include <util/delay.h>
@@ -18,7 +19,7 @@ void sendStartFrame(void);
 void sendStopFrame(void);
 void sendLedColorFrame(uint8_t, uint8_t, uint8_t);
 void sendLedSelectFrame(uint32_t);
-void sendAllFrames(uint32_t, uint8_t, uint8_t, uint8_t);
+void setLED(uint32_t, uint8_t, uint8_t, uint8_t);
 
 int main(void) {
 	
@@ -26,8 +27,15 @@ int main(void) {
 	UARTinit();
 	
     while(1) {
-        for(int i = 0; i < 144; i++) {
-			sendAllFrames(i,100,100,100);
+		
+		///Loops to display demo white chase sequence
+        for(int i = 0; i < LEDS; i++) {
+			setLED(i,100,100,100);
+			_delay_ms(50);
+		}
+		for(int i = LEDS; i > 0; i--) {
+			setLED(i,100,100,100);
+			_delay_ms(50);
 		}
     }
 }
@@ -64,7 +72,7 @@ void sendLedSelectFrame(uint32_t ledNumber) {
 	}
 }
 
-void sendAllFrames(uint32_t ledNumber, uint8_t red, uint8_t green, uint8_t blue) {
+void setLED(uint32_t ledNumber, uint8_t red, uint8_t green, uint8_t blue) {
 	SPI_START();	
 	sendStartFrame();
 	sendLedColorFrame(red, green, blue);

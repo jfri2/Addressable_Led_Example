@@ -3,29 +3,29 @@ Addressable_Led_Example.elf:     file format elf32-avr
 
 Sections:
 Idx Name          Size      VMA       LMA       File off  Algn
-  0 .data         00000010  00800100  0000024e  000002e2  2**0
+  0 .data         00000010  00800100  000002b4  00000348  2**0
                   CONTENTS, ALLOC, LOAD, DATA
-  1 .text         0000024e  00000000  00000000  00000094  2**1
+  1 .text         000002b4  00000000  00000000  00000094  2**1
                   CONTENTS, ALLOC, LOAD, READONLY, CODE
-  2 .bss          00000006  00800110  00800110  000002f2  2**0
+  2 .bss          00000006  00800110  00800110  00000358  2**0
                   ALLOC
-  3 .comment      00000030  00000000  00000000  000002f2  2**0
+  3 .comment      00000030  00000000  00000000  00000358  2**0
                   CONTENTS, READONLY
-  4 .debug_aranges 00000078  00000000  00000000  00000322  2**0
+  4 .debug_aranges 00000078  00000000  00000000  00000388  2**0
                   CONTENTS, READONLY, DEBUGGING
-  5 .debug_info   00000595  00000000  00000000  0000039a  2**0
+  5 .debug_info   0000068f  00000000  00000000  00000400  2**0
                   CONTENTS, READONLY, DEBUGGING
-  6 .debug_abbrev 00000223  00000000  00000000  0000092f  2**0
+  6 .debug_abbrev 00000282  00000000  00000000  00000a8f  2**0
                   CONTENTS, READONLY, DEBUGGING
-  7 .debug_line   000001f3  00000000  00000000  00000b52  2**0
+  7 .debug_line   00000297  00000000  00000000  00000d11  2**0
                   CONTENTS, READONLY, DEBUGGING
-  8 .debug_frame  0000012c  00000000  00000000  00000d48  2**2
+  8 .debug_frame  0000012c  00000000  00000000  00000fa8  2**2
                   CONTENTS, READONLY, DEBUGGING
-  9 .debug_str    00000284  00000000  00000000  00000e74  2**0
+  9 .debug_str    000002bf  00000000  00000000  000010d4  2**0
                   CONTENTS, READONLY, DEBUGGING
- 10 .debug_loc    000003b7  00000000  00000000  000010f8  2**0
+ 10 .debug_loc    000004c0  00000000  00000000  00001393  2**0
                   CONTENTS, READONLY, DEBUGGING
- 11 .debug_ranges 00000068  00000000  00000000  000014af  2**0
+ 11 .debug_ranges 00000068  00000000  00000000  00001853  2**0
                   CONTENTS, READONLY, DEBUGGING
 
 Disassembly of section .text:
@@ -70,7 +70,7 @@ Disassembly of section .text:
   74:	11 e0       	ldi	r17, 0x01	; 1
   76:	a0 e0       	ldi	r26, 0x00	; 0
   78:	b1 e0       	ldi	r27, 0x01	; 1
-  7a:	ee e4       	ldi	r30, 0x4E	; 78
+  7a:	e4 eb       	ldi	r30, 0xB4	; 180
   7c:	f2 e0       	ldi	r31, 0x02	; 2
   7e:	02 c0       	rjmp	.+4      	; 0x84 <__do_copy_data+0x10>
   80:	05 90       	lpm	r0, Z+
@@ -93,7 +93,7 @@ Disassembly of section .text:
   96:	b2 07       	cpc	r27, r18
   98:	e1 f7       	brne	.-8      	; 0x92 <.do_clear_bss_loop>
   9a:	0e 94 0c 01 	call	0x218	; 0x218 <main>
-  9e:	0c 94 25 01 	jmp	0x24a	; 0x24a <_exit>
+  9e:	0c 94 58 01 	jmp	0x2b0	; 0x2b0 <_exit>
 
 000000a2 <__bad_interrupt>:
   a2:	0c 94 00 00 	jmp	0	; 0x0 <__vectors>
@@ -345,9 +345,9 @@ void sendLedSelectFrame(uint32_t ledNumber) {
  1d0:	ef 90       	pop	r14
  1d2:	08 95       	ret
 
-000001d4 <sendAllFrames>:
+000001d4 <setLED>:
 
-void sendAllFrames(uint32_t ledNumber, uint8_t red, uint8_t green, uint8_t blue) {
+void setLED(uint32_t ledNumber, uint8_t red, uint8_t green, uint8_t blue) {
  1d4:	cf 92       	push	r12
  1d6:	df 92       	push	r13
  1d8:	ef 92       	push	r14
@@ -387,7 +387,7 @@ void sendAllFrames(uint32_t ledNumber, uint8_t red, uint8_t green, uint8_t blue)
 
 00000218 <main>:
 void sendLedSelectFrame(uint32_t);
-void sendAllFrames(uint32_t, uint8_t, uint8_t, uint8_t);
+void setLED(uint32_t, uint8_t, uint8_t, uint8_t);
 
 int main(void) {
 	
@@ -397,37 +397,106 @@ int main(void) {
  21c:	0e 94 66 00 	call	0xcc	; 0xcc <UARTinit>
 	
     while(1) {
-        for(int i = 0; i < 144; i++) {
- 220:	c0 e0       	ldi	r28, 0x00	; 0
- 222:	d0 e0       	ldi	r29, 0x00	; 0
- 224:	f1 2c       	mov	r15, r1
- 226:	10 e0       	ldi	r17, 0x00	; 0
-			sendAllFrames(i,100,100,100);
- 228:	be 01       	movw	r22, r28
- 22a:	88 27       	eor	r24, r24
- 22c:	77 fd       	sbrc	r23, 7
- 22e:	80 95       	com	r24
- 230:	98 2f       	mov	r25, r24
- 232:	04 e6       	ldi	r16, 0x64	; 100
- 234:	24 e6       	ldi	r18, 0x64	; 100
- 236:	44 e6       	ldi	r20, 0x64	; 100
- 238:	0e 94 ea 00 	call	0x1d4	; 0x1d4 <sendAllFrames>
-	
-	SPIinit();
+		
+		///Loops to display demo white chase sequence
+        for(int i = 0; i < LEDS; i++) {
+ 220:	e1 2c       	mov	r14, r1
+ 222:	f1 2c       	mov	r15, r1
+ 224:	0f 2e       	mov	r0, r31
+ 226:	f0 e9       	ldi	r31, 0x90	; 144
+ 228:	bf 2e       	mov	r11, r31
+ 22a:	f0 2d       	mov	r31, r0
+ 22c:	10 e0       	ldi	r17, 0x00	; 0
+ 22e:	d0 e0       	ldi	r29, 0x00	; 0
+ 230:	c0 e0       	ldi	r28, 0x00	; 0
+ 232:	91 2c       	mov	r9, r1
+ 234:	a1 2c       	mov	r10, r1
+ 236:	19 c0       	rjmp	.+50     	; 0x26a <main+0x52>
+			setLED(i,100,100,100);
+ 238:	b7 01       	movw	r22, r14
+ 23a:	88 27       	eor	r24, r24
+ 23c:	77 fd       	sbrc	r23, 7
+ 23e:	80 95       	com	r24
+ 240:	98 2f       	mov	r25, r24
+ 242:	04 e6       	ldi	r16, 0x64	; 100
+ 244:	24 e6       	ldi	r18, 0x64	; 100
+ 246:	44 e6       	ldi	r20, 0x64	; 100
+ 248:	0e 94 ea 00 	call	0x1d4	; 0x1d4 <setLED>
+	#else
+		//round up by default
+		__ticks_dc = (uint32_t)(ceil(fabs(__tmp)));
+	#endif
+
+	__builtin_avr_delay_cycles(__ticks_dc);
+ 24c:	2f ef       	ldi	r18, 0xFF	; 255
+ 24e:	80 e7       	ldi	r24, 0x70	; 112
+ 250:	92 e0       	ldi	r25, 0x02	; 2
+ 252:	21 50       	subi	r18, 0x01	; 1
+ 254:	80 40       	sbci	r24, 0x00	; 0
+ 256:	90 40       	sbci	r25, 0x00	; 0
+ 258:	e1 f7       	brne	.-8      	; 0x252 <main+0x3a>
+ 25a:	00 c0       	rjmp	.+0      	; 0x25c <main+0x44>
+ 25c:	00 00       	nop
 	UARTinit();
 	
     while(1) {
-        for(int i = 0; i < 144; i++) {
- 23c:	21 96       	adiw	r28, 0x01	; 1
- 23e:	c0 39       	cpi	r28, 0x90	; 144
- 240:	d1 05       	cpc	r29, r1
- 242:	94 f3       	brlt	.-28     	; 0x228 <main+0x10>
- 244:	cf 2d       	mov	r28, r15
- 246:	d1 2f       	mov	r29, r17
- 248:	ef cf       	rjmp	.-34     	; 0x228 <main+0x10>
+		
+		///Loops to display demo white chase sequence
+        for(int i = 0; i < LEDS; i++) {
+ 25e:	2f ef       	ldi	r18, 0xFF	; 255
+ 260:	e2 1a       	sub	r14, r18
+ 262:	f2 0a       	sbc	r15, r18
+ 264:	02 c0       	rjmp	.+4      	; 0x26a <main+0x52>
+ 266:	e9 2c       	mov	r14, r9
+ 268:	fa 2c       	mov	r15, r10
+ 26a:	80 e9       	ldi	r24, 0x90	; 144
+ 26c:	e8 16       	cp	r14, r24
+ 26e:	f1 04       	cpc	r15, r1
+ 270:	1c f3       	brlt	.-58     	; 0x238 <main+0x20>
+ 272:	cb 2c       	mov	r12, r11
+ 274:	d1 2e       	mov	r13, r17
+ 276:	ed 2e       	mov	r14, r29
+ 278:	fc 2e       	mov	r15, r28
+			setLED(i,100,100,100);
+			_delay_ms(50);
+		}
+		for(int i = LEDS; i > 0; i--) {
+			setLED(i,100,100,100);
+ 27a:	04 e6       	ldi	r16, 0x64	; 100
+ 27c:	24 e6       	ldi	r18, 0x64	; 100
+ 27e:	44 e6       	ldi	r20, 0x64	; 100
+ 280:	c7 01       	movw	r24, r14
+ 282:	b6 01       	movw	r22, r12
+ 284:	0e 94 ea 00 	call	0x1d4	; 0x1d4 <setLED>
+ 288:	9f ef       	ldi	r25, 0xFF	; 255
+ 28a:	20 e7       	ldi	r18, 0x70	; 112
+ 28c:	82 e0       	ldi	r24, 0x02	; 2
+ 28e:	91 50       	subi	r25, 0x01	; 1
+ 290:	20 40       	sbci	r18, 0x00	; 0
+ 292:	80 40       	sbci	r24, 0x00	; 0
+ 294:	e1 f7       	brne	.-8      	; 0x28e <main+0x76>
+ 296:	00 c0       	rjmp	.+0      	; 0x298 <main+0x80>
+ 298:	00 00       	nop
+ 29a:	91 e0       	ldi	r25, 0x01	; 1
+ 29c:	c9 1a       	sub	r12, r25
+ 29e:	d1 08       	sbc	r13, r1
+ 2a0:	e1 08       	sbc	r14, r1
+ 2a2:	f1 08       	sbc	r15, r1
+		///Loops to display demo white chase sequence
+        for(int i = 0; i < LEDS; i++) {
+			setLED(i,100,100,100);
+			_delay_ms(50);
+		}
+		for(int i = LEDS; i > 0; i--) {
+ 2a4:	c1 14       	cp	r12, r1
+ 2a6:	d1 04       	cpc	r13, r1
+ 2a8:	e1 04       	cpc	r14, r1
+ 2aa:	f1 04       	cpc	r15, r1
+ 2ac:	31 f7       	brne	.-52     	; 0x27a <main+0x62>
+ 2ae:	db cf       	rjmp	.-74     	; 0x266 <main+0x4e>
 
-0000024a <_exit>:
- 24a:	f8 94       	cli
+000002b0 <_exit>:
+ 2b0:	f8 94       	cli
 
-0000024c <__stop_program>:
- 24c:	ff cf       	rjmp	.-2      	; 0x24c <__stop_program>
+000002b2 <__stop_program>:
+ 2b2:	ff cf       	rjmp	.-2      	; 0x2b2 <__stop_program>
